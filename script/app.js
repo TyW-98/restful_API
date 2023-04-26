@@ -8,6 +8,8 @@ mongoose.connect("mongodb://127.0.0.1:27017/wikiDB");
 
 const app = express();
 app.set('view engine', 'ejs');
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static("public"))
 
 const articleSchema = new mongoose.Schema({
   title: {
@@ -44,9 +46,13 @@ Article.find().then((article) => {
   }
 });
 
-app.get("/", (req, res) => {
-  res.send("Test js file ");
-});
+app.get("/articles", (req, res) => {
+  Article.find().then((article) => {
+    console.log(article);
+  }).catch((error => {
+    console.log(error);
+  }))
+})
 
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
