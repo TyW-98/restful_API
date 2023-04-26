@@ -61,8 +61,15 @@ app.post("/articles", (req, res) => {
   const newArticle = new Article({
     title: req.body.title,
     content: req.body.content,
-  })
-  newArticle.save()
+  });
+  newArticle
+    .save()
+    .then(() => {
+      res.send("Successfully added new article");
+    })
+    .catch((err) => {
+      res.send(err);
+    });
 });
 
 app.listen(3000, () => {
