@@ -116,7 +116,7 @@ app
     try {
       const updateArticle = await Article.findOneAndUpdate(
         { _id: req.params.articleId },
-        { $set: { content: req.body.content } }
+        { $set: req.body }
       );
       if (updateArticle) {
         res.send(`The content of ${updateArticle.title} has been updated`);
