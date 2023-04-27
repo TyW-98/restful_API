@@ -77,6 +77,16 @@ app
     }
   });
 
+app.route("/articles/:articleId")
+  .get(async (req, res) => {
+  try {
+    const selectedArticle = await Article.findOne({ _id: req.params.articleId });
+    res.send(selectedArticle);
+  } catch (error) {
+    res.send(error);
+  }
+});
+
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
 });
