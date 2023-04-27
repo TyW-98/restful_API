@@ -95,16 +95,31 @@ app
   })
   .put(async (req, res) => {
     try {
-      const oldArticleTitle = await Article.findOne({ _id: req.params.articleId})
-      const updateArticle = await Article.findOneAndUpdate(
+      const oldArticleTitle = await Article.findOne({
+        _id: req.params.articleId,
+      });
+      const replacedArticle = await Article.findOneAndUpdate(
         { _id: req.params.articleId },
         { title: req.body.title, content: req.body.content },
         { overwrite: true }
       );
-      if (updateArticle) {
+      if (replacedArticle) {
         res.send(
           `The following article with the title ${oldArticleTitle.title} has been updated to ${req.body.title}`
         );
+      }
+    } catch (error) {
+      res.send(error);
+    }
+  })
+  .patch(async (req, res) => {
+    try {
+      const updateArticle = await Article.findOneAndUpdate(
+        { _id: req.params.articleId },
+        { $set: { content: req.body.content } }
+      );
+      if (updateArticle) {
+        res.send(`The content of ${updateArticle.title} has been updated`);
       }
     } catch (error) {
       res.send(error);
