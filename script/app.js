@@ -7,7 +7,9 @@ const mongoose = require("mongoose");
 mongoose.connect("mongodb://127.0.0.1:27017/wikiDB");
 
 const app = express();
-app.set('view engine', 'ejs');
+app.set("view engine", "ejs");
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static("public"));
 
 const articleSchema = new mongoose.Schema({
   title: {
@@ -44,9 +46,40 @@ Article.find().then((article) => {
   }
 });
 
-app.get("/", (req, res) => {
-  res.send("Test js file ");
-});
+app
+  .route("/articles")
+  .get((req, res) => {
+    Article.find()
+      .then((article) => {
+        res.send(article);
+      })
+      .catch((error) => {
+        res.send(error);
+      });
+  })
+  .post((req, res) => {
+    const newArticle = new Article({
+      title: req.body.title,
+      content: req.body.content,
+    });
+    newArticle
+      .save()
+      .then(() => {
+        res.send("Successfully added new article");
+      })
+      .catch((error) => {
+        res.send(error);
+      });
+  })
+  .delete((req, res) => {
+    Article.deleteMany({})
+      .then(() => {
+        res.send("Deleted all articles");
+      })
+      .catch((error) => {
+        res.send(error);
+      });
+  });
 
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
