@@ -77,19 +77,39 @@ app
     }
   });
 
-app.route("/articles/:articleId")
+app
+  .route("/articles/:articleId")
   .get(async (req, res) => {
-  try {
-    const selectedArticle = await Article.findOne({ _id: req.params.articleId });
-    if (selectedArticle) {
-      res.send(selectedArticle);
-    } else {
-      res.send("No article with such id was found");
+    try {
+      const selectedArticle = await Article.findOne({
+        _id: req.params.articleId,
+      });
+      if (selectedArticle) {
+        res.send(selectedArticle);
+      } else {
+        res.send("No article with such id was found");
+      }
+    } catch (error) {
+      res.send(error);
     }
-  } catch (error) {
-    res.send(error);
-  }
-});
+  })
+  .put(async (req, res) => {
+    try {
+      const oldArticleTitle = await Article.findOne({ _id: req.params.articleId})
+      const updateArticle = await Article.findOneAndUpdate(
+        { _id: req.params.articleId },
+        { title: req.body.title, content: req.body.content },
+        { overwrite: true }
+      );
+      if (updateArticle) {
+        res.send(
+          `The following article with the title ${oldArticleTitle.title} has been updated to ${req.body.title}`
+        );
+      }
+    } catch (error) {
+      res.send(error);
+    }
+  });
 
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
