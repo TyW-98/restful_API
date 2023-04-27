@@ -46,41 +46,40 @@ Article.find().then((article) => {
   }
 });
 
-app.get("/articles", (req, res) => {
-  Article.find()
-    .then((article) => {
-      res.send(article);
-    })
-    .catch((error) => {
-      console.log(error);
-      res.send(error);
+app
+  .route("/articles")
+  .get((req, res) => {
+    Article.find()
+      .then((article) => {
+        res.send(article);
+      })
+      .catch((error) => {
+        res.send(error);
+      });
+  })
+  .post((req, res) => {
+    const newArticle = new Article({
+      title: req.body.title,
+      content: req.body.content,
     });
-});
-
-app.post("/articles", (req, res) => {
-  const newArticle = new Article({
-    title: req.body.title,
-    content: req.body.content,
+    newArticle
+      .save()
+      .then(() => {
+        res.send("Successfully added new article");
+      })
+      .catch((error) => {
+        res.send(error);
+      });
+  })
+  .delete((req, res) => {
+    Article.deleteMany({})
+      .then(() => {
+        res.send("Deleted all articles");
+      })
+      .catch((error) => {
+        res.send(error);
+      });
   });
-  newArticle
-    .save()
-    .then(() => {
-      res.send("Successfully added new article");
-    })
-    .catch((err) => {
-      res.send(err);
-    });
-});
-
-app.delete("/articles", (req, res) => {
-  Article.deleteMany({})
-    .then(() => {
-      res.send("Deleted all articles");
-    })
-    .catch((err) => {
-      res.send(err);
-    });
-});
 
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
