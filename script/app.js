@@ -124,6 +124,23 @@ app
     } catch (error) {
       res.send(error);
     }
+  })
+  .delete(async (req, res) => {
+    try {
+      const articleName = await Article.findOne({ _id: req.params.articleId });
+      const deleteArticle = await Article.deleteOne({
+        _id: req.params.articleId,
+      });
+      if (deleteArticle) {
+        res.send(`The article - ${articleName.title} has been deleted`);
+      } else {
+        res.send(
+          `There is no article associated with that id`
+        );
+      }
+    } catch (error) {
+      res.send(error);
+    }
   });
 
 app.listen(3000, () => {
