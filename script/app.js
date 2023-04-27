@@ -81,7 +81,11 @@ app.route("/articles/:articleId")
   .get(async (req, res) => {
   try {
     const selectedArticle = await Article.findOne({ _id: req.params.articleId });
-    res.send(selectedArticle);
+    if (selectedArticle) {
+      res.send(selectedArticle);
+    } else {
+      res.send("No article with such id was found");
+    }
   } catch (error) {
     res.send(error);
   }
