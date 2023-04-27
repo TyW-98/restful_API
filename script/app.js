@@ -48,37 +48,99 @@ Article.find().then((article) => {
 
 app
   .route("/articles")
-  .get((req, res) => {
-    Article.find()
-      .then((article) => {
-        res.send(article);
-      })
-      .catch((error) => {
-        res.send(error);
-      });
+  .get(async (req, res) => {
+    try {
+      const allArticles = await Article.find();
+      res.send(allArticles);
+    } catch (error) {
+      res.send(error);
+    }
   })
-  .post((req, res) => {
-    const newArticle = new Article({
-      title: req.body.title,
-      content: req.body.content,
-    });
-    newArticle
-      .save()
-      .then(() => {
-        res.send("Successfully added new article");
-      })
-      .catch((error) => {
-        res.send(error);
+  .post(async (req, res) => {
+    try {
+      const newArticle = new Article({
+        title: req.body.title,
+        content: req.body.content,
       });
+      await newArticle.save();
+      res.send("Successfully added new article");
+    } catch (error) {
+      res.send(error);
+    }
   })
-  .delete((req, res) => {
-    Article.deleteMany({})
-      .then(() => {
-        res.send("Deleted all articles");
-      })
-      .catch((error) => {
-        res.send(error);
+  .delete(async (req, res) => {
+    try {
+      await Article.deleteMany({});
+      res.send("Deleted all articles");
+    } catch (error) {
+      res.send(error);
+    }
+  });
+
+app
+  .route("/articles/:articleId")
+  .get(async (req, res) => {
+    try {
+      const selectedArticle = await Article.findOne({
+        _id: req.params.articleId,
       });
+      if (selectedArticle) {
+        res.send(selectedArticle);
+      } else {
+        res.send("No article with such id was found");
+      }
+    } catch (error) {
+      res.send(error);
+    }
+  })
+  .put(async (req, res) => {
+    try {
+      const oldArticleTitle = await Article.findOne({
+        _id: req.params.articleId,
+      });
+      const replacedArticle = await Article.findOneAndUpdate(
+        { _id: req.params.articleId },
+        { title: req.body.title, content: req.body.content },
+        { overwrite: true }
+      );
+      if (replacedArticle) {
+        res.send(
+          `The following article with the title ${oldArticleTitle.title} has been updated to ${req.body.title}`
+        );
+      }
+    } catch (error) {
+      res.send(error);
+    }
+  })
+  .patch(async (req, res) => {
+    try {
+      const updateArticle = await Article.findOneAndUpdate(
+        { _id: req.params.articleId },
+        { $set: req.body }
+      );
+      if (updateArticle) {
+        res.send(`The content of ${updateArticle.title} has been updated`);
+      }
+    } catch (error) {
+      res.send(error);
+    }
+  })
+  .delete(async (req, res) => {
+    try {
+      const articleName = await Article.findOne({ _id: req.params.articleId });
+      const deleteArticle = await Article.deleteOne({
+        _id: req.params.articleId,
+      });
+      if (deleteArticle) {
+        res.send(`The article - ${articleName.title} has been deleted`);
+      } else {
+        res.send(
+          `There is no article associated with that id`
+        );
+      }
+    } catch (error) {
+      res.send(error);
+    }
   });
 
 app.listen(3000, () => {
