@@ -48,37 +48,33 @@ Article.find().then((article) => {
 
 app
   .route("/articles")
-  .get((req, res) => {
-    Article.find()
-      .then((article) => {
-        res.send(article);
-      })
-      .catch((error) => {
-        res.send(error);
-      });
+  .get(async (req, res) => {
+    try {
+      const allArticles = await Article.find();
+      res.send(allArticles);
+    } catch (error) {
+      res.send(error);
+    }
   })
-  .post((req, res) => {
-    const newArticle = new Article({
-      title: req.body.title,
-      content: req.body.content,
-    });
-    newArticle
-      .save()
-      .then(() => {
-        res.send("Successfully added new article");
-      })
-      .catch((error) => {
-        res.send(error);
+  .post(async (req, res) => {
+    try {
+      const newArticle = new Article({
+        title: req.body.title,
+        content: req.body.content,
       });
+      await newArticle.save();
+      res.send("Successfully added new article");
+    } catch (error) {
+      res.send(error);
+    }
   })
-  .delete((req, res) => {
-    Article.deleteMany({})
-      .then(() => {
-        res.send("Deleted all articles");
-      })
-      .catch((error) => {
-        res.send(error);
-      });
+  .delete(async (req, res) => {
+    try {
+      await Article.deleteMany({});
+      res.send("Deleted all articles");
+    } catch (error) {
+      res.send(error);
+    }
   });
 
 app.listen(3000, () => {
